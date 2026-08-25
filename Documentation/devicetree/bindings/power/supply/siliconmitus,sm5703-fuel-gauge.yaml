@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/power/supply/siliconmitus,sm5703-fuel-gauge.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Silicon Mitus SM5703 fuel gauge
+
+maintainers:
+  - Markuss Broks <markuss.broks@gmail.com>
+
+description: |
+  The fuel gauge block of the SM5703 PMIC is addressed over its own I2C
+  line, separate from the main SM5703 MFD node documented in
+  siliconmitus,sm5703.yaml, so it is described as an independent node.
+
+properties:
+  compatible:
+    const: siliconmitus,sm5703-fuel-gauge
+
+  reg:
+    maxItems: 1
+
+  monitored-battery: true
+
+required:
+  - compatible
+  - reg
+
+additionalProperties: false
+
+examples:
+  - |
+    i2c {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        fuel-gauge@71 {
+            compatible = "siliconmitus,sm5703-fuel-gauge";
+            reg = <0x71>;
+            monitored-battery = <&battery>;
+        };
+    };
+...

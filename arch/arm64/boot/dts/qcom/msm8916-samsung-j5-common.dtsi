@@ -104,6 +104,107 @@
 		};
 	};
 
+	/*
+	 * Main SM5703 line (regulators/charger/LED), confirmed against
+	 * downstream j5lte board dts (identical across eur-r00/r01/r05
+	 * and chn-r00/r01): i2c_11, sda=gpio22, scl=gpio23, addr 0x49,
+	 * mrstb (reset) = gpio24, irq = gpio62.
+	 */
+	i2c_pmic: i2c-pmic {
+		compatible = "i2c-gpio";
+		sda-gpios = <&tlmm 22 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&tlmm 23 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pmic_i2c_default>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		sm5703_pmic: pmic@49 {
+			compatible = "siliconmitus,sm5703";
+			reg = <0x49>;
+
+			interrupt-parent = <&tlmm>;
+			interrupts = <62 IRQ_TYPE_EDGE_FALLING>;
+
+			reset-gpios = <&tlmm 24 GPIO_ACTIVE_HIGH>;
+
+			pinctrl-names = "default";
+			pinctrl-0 = <&pmic_int_default>;
+
+			regulators {
+				sm5703_ldo1: ldo1 {
+					regulator-name = "cam_sensor_a2v8";
+					regulator-min-microvolt = <2800000>;
+					regulator-max-microvolt = <2800000>;
+				};
+
+				sm5703_ldo2: ldo2 {
+					regulator-name = "vdd_motor";
+					regulator-min-microvolt = <1500000>;
+					regulator-max-microvolt = <3300000>;
+				};
+
+				/* VDD_TSP_3.0V downstream - feeds the touchscreen */
+				sm5703_ldo3: ldo3 {
+					regulator-name = "vdd_tsp_3v0";
+					regulator-min-microvolt = <3000000>;
+					regulator-max-microvolt = <3000000>;
+				};
+
+				sm5703_buck: buck {
+					regulator-name = "cam_sensor_core_1v5";
+					regulator-min-microvolt = <1500000>;
+					regulator-max-microvolt = <1500000>;
+				};
+
+				sm5703_usbldo1: usbldo1 {
+					regulator-name = "usbldo1";
+				};
+
+				sm5703_usbldo2: usbldo2 {
+					regulator-name = "usbldo2";
+				};
+
+				sm5703_vbus: vbus {
+					regulator-name = "vbus";
+				};
+			};
+		};
+	};
+
+	/*
+	 * Fuel gauge line, separate from the main SM5703 bus - confirmed
+	 * against the same downstream board dts: i2c_10, sda=gpio14,
+	 * scl=gpio15, addr 0x71, fuel_int = gpio121.
+	 */
+	i2c_fuelgauge: i2c-fuelgauge {
+		compatible = "i2c-gpio";
+		sda-gpios = <&tlmm 14 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&tlmm 15 (GPIO_ACTIVE_HIGH|GPIO_OPEN_DRAIN)>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&fuelgauge_i2c_default>;
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		fuelgauge: fuel-gauge@71 {
+			compatible = "siliconmitus,sm5703-fuel-gauge";
+			reg = <0x71>;
+
+			interrupt-parent = <&tlmm>;
+			interrupts = <121 IRQ_TYPE_EDGE_FALLING>;
+
+			/* MUIC reports cable presence over extcon */
+			extcon = <&muic>;
+
+			pinctrl-names = "default";
+			pinctrl-0 = <&fuelgauge_int_default>;
+		};
+	};
+
 	i2c_sensors: i2c-sensors {
 		compatible = "i2c-gpio";
 
@@ -344,6 +445,38 @@
 
 	muic_int_default: muic-int-default-state {
 		pins = "gpio12";
+		function = "gpio";
+
+		drive-strength = <2>;
+		bias-disable;
+	};
+
+	pmic_i2c_default: pmic-i2c-default-state {
+		pins = "gpio22", "gpio23";
+		function = "gpio";
+
+		drive-strength = <2>;
+		bias-disable;
+	};
+
+	pmic_int_default: pmic-int-default-state {
+		pins = "gpio62";
+		function = "gpio";
+
+		drive-strength = <2>;
+		bias-disable;
+	};
+
+	fuelgauge_i2c_default: fuelgauge-i2c-default-state {
+		pins = "gpio14", "gpio15";
+		function = "gpio";
+
+		drive-strength = <2>;
+		bias-disable;
+	};
+
+	fuelgauge_int_default: fuelgauge-int-default-state {
+		pins = "gpio121";
 		function = "gpio";
 
 		drive-strength = <2>;
