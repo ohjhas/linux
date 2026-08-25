@@ -1512,13 +1512,6 @@ config REGULATOR_SLG51000
 	  The SLG51000 is seven compact and customizable low dropout
 	  regulators.
 
-config REGULATOR_SM5703
-	tristate "Silicon Mitus SM5703 regulators"
-	depends on MFD_SM5703
-	help
-	  This driver provides support for voltage regulators of the
-	  SM5703 PMIC.
-
 config REGULATOR_SPACEMIT_P1
 	tristate "SpacemiT P1 regulators"
 	depends on ARCH_SPACEMIT || COMPILE_TEST

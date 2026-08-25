@@ -1516,18 +1516,6 @@ config MFD_SM501_GPIO
 	  lines on the SM501. The platform data is used to supply the
 	  base number for the first GPIO line to register.
 
-config MFD_SM5703
-	tristate "Silicon Mitus SM5703 PMIC"
-	depends on I2C
-	depends on OF
-	select MFD_CORE
-	select REGMAP_I2C
-	help
-	  This is the core driver for the Silicon Mitus SM5703 PMIC. This
-	  device is used in phones and has several functions, including
-	  an LED controller, regulators, a fuel gauge, a MUIC and a
-	  charger circuit.
-
 config MFD_SKY81452
 	tristate "Skyworks Solutions SKY81452"
 	select MFD_CORE
